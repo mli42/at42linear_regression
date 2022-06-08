@@ -1,14 +1,12 @@
 import numpy as np
+import utils
 
 class MyLinearRegression():
 
-    def __init__(self, thetas: np.ndarray, alpha: float = 0.001, max_iter: int = 1000):
-        if isinstance(thetas, list):
-            thetas = np.asarray(thetas).reshape(len(thetas), 1)
-        thetas = thetas.astype("float64")
+    def __init__(self, alpha: float = 0.001, max_iter: int = 1000):
         self.alpha = alpha
         self.max_iter = max_iter
-        self.thetas = thetas
+        self.theta = utils.get_theta()
 
     @staticmethod
     def mse_(y: np.ndarray, y_hat: np.ndarray) -> float:
@@ -55,47 +53,40 @@ class MyLinearRegression():
         j_elem = MyLinearRegression.cost_elem_(y, y_hat)
         return np.sum(j_elem)
 
-    def gradient_(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Computes a gradient vector from three non-empty numpy.ndarray, without any for loop.
-            The three arrays must have compatible dimensions.
+    def gradient(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+        """Computes a gradient vector from three non-empty numpy.ndarray
         Args:
             x: has to be a numpy.ndarray, a matrix of dimension m * 1.
             y: has to be a numpy.ndarray, a vector of dimension m * 1.
             theta: has to be a numpy.ndarray, a 2 * 1 vector.
         Returns:
             The gradient as a numpy.ndarray, a vector of dimension 2 * 1.
-            None if x, y, or theta is an empty numpy.ndarray.
-            None if x, y and theta do not have compatible dimensions.
-        Raises:
-            This function should not raise any Exception.
         """
         m = x.shape[0]
         x = self.add_intercept(x)
-        nabla_j = x.T.dot(x.dot(self.thetas) - y) / m
+        nabla_j = x.T.dot(x.dot(self.theta) - y) / m
         return nabla_j
 
-    def fit_(self, x: np.ndarray, y: np.ndarray) -> None:
+    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
         """
         Description:
             Fits the model to the training dataset contained in x and y.
         Args:
-            x: a vector of dimension m * 1: (number of training examples, 1).
-            y: a vector of dimension m * 1: (number of training examples, 1).
+            x: a vector of dimension m * 1
+            y: a vector of dimension m * 1
             theta: a vector of dimension 2 * 1.
-            alpha: has to be a float, the learning rate
-            max_iter: has to be an int, the number of iterations done
+            alpha: a float, the learning rate
+            max_iter: an int, the number of iterations done
         Returns:
             new_theta: numpy.ndarray, a vector of dimension 2 * 1.
             None if there is a matching dimension problem.
-        Raises:
-            This function should not raise any Exception.
         """
-        theta = self.thetas
+        theta = self.theta
         alpha = self.alpha
         if x.shape != y.shape or theta.shape != (2, 1):
             return None
         for _ in range(self.max_iter):
-            new_theta = self.gradient_(x, y)
-            theta[0][0] -= alpha * new_theta[0][0]
-            theta[1][0] -= alpha * new_theta[1][0]
-        self.thetas = theta
+            gradient = self.gradient(x, y)
+            theta[0][0] -= alpha * gradient[0][0]
+            theta[1][0] -= alpha * gradient[1][0]
+        self.theta = theta
