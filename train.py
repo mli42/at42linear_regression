@@ -78,18 +78,13 @@ class MyLinearRegression():
             theta: a vector of dimension 2 * 1.
             alpha: a float, the learning rate
             max_iter: an int, the number of iterations done
-        Returns:
-            new_theta: numpy.ndarray, a vector of dimension 2 * 1.
-            None if there is a matching dimension problem.
         """
-        theta = self.theta
         alpha = self.alpha
-        if x.shape != y.shape or theta.shape != (2, 1):
+        if x.shape != y.shape or self.theta.shape != (2, 1):
             return None
         for _ in range(self.max_iter):
             gradient = alpha * self.gradient(x, y)
-            theta -= gradient
-        self.theta = theta
+            self.theta -= gradient
         utils.save_theta(self.theta)
 
 def main():
