@@ -1,5 +1,7 @@
 import numpy as np
 
+THETA_FILE = "theta.txt"
+
 def add_intercept(x: np.ndarray) -> np.ndarray:
     """Adds a column of 1's on the left to the non-empty numpy.ndarray x.
     Args:
@@ -28,6 +30,34 @@ def predict(x: np.ndarray, theta: np.ndarray) -> np.ndarray:
     y_hat = x_prime.dot(theta)
     return y_hat
 
+def str_array(array: np.ndarray) -> str:
+    return str(array).replace('\n', '')
+
+def save_theta(theta: np.ndarray) -> None:
+    print(f"{save_theta.__name__}: saving {str_array(theta)}")
+    try:
+        with open(THETA_FILE, "w") as file:
+            for element in theta:
+                file.write(f"{element[0]}\n")
+    except Exception as e:
+        print(f"{save_theta.__name__} failed: {e}")
+
 def get_theta() -> np.ndarray:
-    theta = np.asarray([[0],[0]])
+    theta = np.asarray([[.0],[.0]])
+
+    try:
+        tmp_theta = theta.copy()
+        with open(THETA_FILE, "r") as file:
+            for i, line in enumerate(file):
+                if i >= 2:
+                    raise Exception("File too long")
+                tmp_theta[i][0] = float(line.strip())
+                if np.isnan(tmp_theta[i][0]):
+                    raise Exception("Has NaN")
+            if i < 1:
+                raise Exception("File too short")
+        theta = tmp_theta
+    except Exception as e:
+        print(f"File `{THETA_FILE}` corrupted: {e}")
+        save_theta(theta)
     return theta

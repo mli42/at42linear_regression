@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import utils
 
 class MyLinearRegression():
@@ -63,7 +64,7 @@ class MyLinearRegression():
             The gradient as a numpy.ndarray, a vector of dimension 2 * 1.
         """
         m = x.shape[0]
-        x = self.add_intercept(x)
+        x = utils.add_intercept(x)
         nabla_j = x.T.dot(x.dot(self.theta) - y) / m
         return nabla_j
 
@@ -86,7 +87,16 @@ class MyLinearRegression():
         if x.shape != y.shape or theta.shape != (2, 1):
             return None
         for _ in range(self.max_iter):
-            gradient = self.gradient(x, y)
-            theta[0][0] -= alpha * gradient[0][0]
-            theta[1][0] -= alpha * gradient[1][0]
+            gradient = alpha * self.gradient(x, y)
+            theta -= gradient
         self.theta = theta
+        utils.save_theta(self.theta)
+
+def main():
+    mylr = MyLinearRegression(3e-11)
+    data = pd.read_csv("./resources/data.csv")
+    km, price = data["km"].values.reshape(-1, 1), data["price"].values.reshape(-1, 1)
+    mylr.fit(km, price)
+
+if __name__ == "__main__":
+    main()
