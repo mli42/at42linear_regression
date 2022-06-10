@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import utils
 
 class MyLinearRegression():
@@ -8,6 +9,7 @@ class MyLinearRegression():
         self.alpha = alpha
         self.max_iter = max_iter
         self.theta = utils.get_theta()
+        print(f"MyLR: got theta {utils.str_array(self.theta)}")
 
     @staticmethod
     def mse_(y: np.ndarray, y_hat: np.ndarray) -> float:
@@ -54,6 +56,12 @@ class MyLinearRegression():
         j_elem = MyLinearRegression.cost_elem_(y, y_hat)
         return np.sum(j_elem)
 
+    def plot(self, x: np.ndarray, y: np.ndarray) -> None:
+        h = lambda x, theta: utils.predict(x, theta)
+        plt.plot(x, y, "o")
+        plt.plot(x, h(x, self.theta))
+        plt.show()
+
     def gradient(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Computes a gradient vector from three non-empty numpy.ndarray
         Args:
@@ -86,6 +94,7 @@ class MyLinearRegression():
             gradient = alpha * self.gradient(x, y)
             self.theta -= gradient
         utils.save_theta(self.theta)
+        self.plot(x, y)
 
 def main():
     mylr = MyLinearRegression(3e-11)
