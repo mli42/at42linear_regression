@@ -1,4 +1,6 @@
 import numpy as np
+import pandas as pd
+from typing import Tuple
 
 THETA_FILE = "theta.txt"
 
@@ -61,3 +63,30 @@ def get_theta() -> np.ndarray:
         print(f"File `{THETA_FILE}` corrupted: {e}")
         save_theta(theta)
     return theta
+
+def minmax(x: np.ndarray, x_min: float, x_max: float) -> np.ndarray:
+    """Computes the normalized version of a non-empty numpy.ndarray using the min-max standardization.
+    Args:
+        x: has to be an numpy.ndarray, m * 1.
+    Returns:
+        x' as a numpy.ndarray, m * 1.
+    """
+    span = x_max - x_min
+    res = (x - x_min) / span
+    return res
+
+def get_data() -> Tuple[np.ndarray, np.ndarray]:
+    """Read the data.csv and returns the data
+
+    Returns:
+        Tuple[np.ndarray, np.ndarray]: km (x), price (y)
+        None on error
+    """
+    try:
+        data = pd.read_csv("./resources/data.csv")
+    except Exception as e:
+        print(f"{get_data.__name__}: {e}")
+        exit(1)
+    km = data["km"].values.reshape(-1, 1)
+    price = data["price"].values.reshape(-1, 1)
+    return (km, price)

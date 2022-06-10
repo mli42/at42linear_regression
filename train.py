@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 import utils
 
@@ -60,7 +59,21 @@ class MyLinearRegression():
         h = lambda x, theta: utils.predict(x, theta)
         plt.plot(x, y, "o")
         plt.plot(x, h(x, self.theta))
+
+        plt.legend(['Dataset','Hypothesis'])
+        plt.xlabel("Normalized mileage (km)")
+        plt.ylabel("Price of car")
         plt.show()
+
+    def minmax(self, x: np.ndarray) -> np.ndarray:
+        """Computes the normalized version of a non-empty numpy.ndarray using the min-max standardization.
+        Args:
+            x: has to be an numpy.ndarray, m * 1.
+        Returns:
+            x' as a numpy.ndarray, m * 1.
+        """
+        res = utils.minmax(x, np.min(x), np.max(x))
+        return res
 
     def gradient(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Computes a gradient vector from three non-empty numpy.ndarray
@@ -90,6 +103,7 @@ class MyLinearRegression():
         alpha = self.alpha
         if x.shape != y.shape or self.theta.shape != (2, 1):
             return None
+        x = self.minmax(x)
         for _ in range(self.max_iter):
             gradient = alpha * self.gradient(x, y)
             self.theta -= gradient
@@ -97,9 +111,8 @@ class MyLinearRegression():
         self.plot(x, y)
 
 def main():
-    mylr = MyLinearRegression(3e-11)
-    data = pd.read_csv("./resources/data.csv")
-    km, price = data["km"].values.reshape(-1, 1), data["price"].values.reshape(-1, 1)
+    mylr = MyLinearRegression(0.1)
+    km, price = utils.get_data()
     mylr.fit(km, price)
 
 if __name__ == "__main__":
