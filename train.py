@@ -55,13 +55,12 @@ class MyLinearRegression():
         j_elem = MyLinearRegression.cost_elem_(y, y_hat)
         return np.sum(j_elem)
 
-    def plot(self, x: np.ndarray, y: np.ndarray) -> None:
-        h = lambda x, theta: utils.predict(x, theta)
+    def plot(self, x: np.ndarray, y: np.ndarray, y_hat: np.ndarray) -> None:
         plt.plot(x, y, "o")
-        plt.plot(x, h(x, self.theta))
+        plt.plot(x, y_hat)
 
         plt.legend(['Dataset','Hypothesis'])
-        plt.xlabel("Normalized mileage (km)")
+        plt.xlabel("Mileage (km)")
         plt.ylabel("Price of car")
         plt.show()
 
@@ -85,8 +84,9 @@ class MyLinearRegression():
             The gradient as a numpy.ndarray, a vector of dimension 2 * 1.
         """
         m = x.shape[0]
-        x = utils.add_intercept(x)
-        nabla_j = x.T.dot(x.dot(self.theta) - y) / m
+        theta0 = self.alpha * np.sum(utils.predict(x, self.theta) - y) / m
+        theta1 = self.alpha * np.sum((utils.predict(x, self.theta) - y) * x) / m
+        nabla_j = np.asarray([[theta0], [theta1]])
         return nabla_j
 
     def fit(self, x: np.ndarray, y: np.ndarray) -> None:
@@ -103,12 +103,13 @@ class MyLinearRegression():
         alpha = self.alpha
         if x.shape != y.shape or self.theta.shape != (2, 1):
             return None
-        x = self.minmax(x)
+        norm_x = self.minmax(x)
         for _ in range(self.max_iter):
-            gradient = alpha * self.gradient(x, y)
+            gradient = self.gradient(norm_x, y)
             self.theta -= gradient
         utils.save_theta(self.theta)
-        self.plot(x, y)
+        y_hat = utils.predict(norm_x, self.theta)
+        self.plot(x, y, y_hat)
 
 def main():
     mylr = MyLinearRegression(0.1)

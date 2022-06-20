@@ -4,17 +4,6 @@ from typing import Tuple
 
 THETA_FILE = "theta.txt"
 
-def add_intercept(x: np.ndarray) -> np.ndarray:
-    """Adds a column of 1's on the left to the non-empty numpy.ndarray x.
-    Args:
-        x: has to be an numpy.ndarray, a vector of dimension m * 1.
-    Returns:
-        x as a numpy.ndarray, a vector of dimension m * 2.
-    """
-    ones = np.ones((x.shape[0], 1))
-    res = np.concatenate((ones, x), axis=1)
-    return res
-
 def predict(x: np.ndarray, theta: np.ndarray) -> np.ndarray:
     """Computes the vector of prediction y_hat from two non-empty numpy.ndarray.
     Args:
@@ -24,12 +13,7 @@ def predict(x: np.ndarray, theta: np.ndarray) -> np.ndarray:
         y_hat as a numpy.ndarray, a vector of dimension m * 1.
         None on error
     """
-    x_prime = add_intercept(x)
-    if (x_prime is None or
-        x_prime.shape[1] != theta.shape[0] or
-        theta.shape[1] != 1):
-        return None
-    y_hat = x_prime.dot(theta)
+    y_hat = theta[0][0] + theta[1][0] * x
     return y_hat
 
 def str_array(array: np.ndarray) -> str:
