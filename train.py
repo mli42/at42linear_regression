@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import utils
+import argparse
 from typing import List
 
 class MyLinearRegression():
@@ -26,7 +27,7 @@ class MyLinearRegression():
         j_elem = (y_hat - y) ** 2 / y.shape[0]
         return np.sum(j_elem)
 
-    def plot(self, x: np.ndarray, y: np.ndarray, y_hat: np.ndarray, losses: List[float]) -> None:
+    def plot_hypo(self, x: np.ndarray, y: np.ndarray, y_hat: np.ndarray):
         plt.figure()
         # Data repartition
         plt.plot(x, y, "o")
@@ -36,6 +37,9 @@ class MyLinearRegression():
         plt.legend(['Dataset','Hypothesis'])
         plt.xlabel("Mileage (km)")
         plt.ylabel("Price of car")
+
+    def plot(self, x: np.ndarray, y: np.ndarray, y_hat: np.ndarray, losses: List[float]) -> None:
+        self.plot_hypo(x, y, y_hat)
 
         plt.figure()
         plt.title('Train loss through epochs')
@@ -87,21 +91,34 @@ class MyLinearRegression():
             return None
         norm_x = self.minmax(x)
         losses = []
-        for _ in range(self.max_iter):
+        for i in range(self.max_iter):
             gradient = self.gradient(norm_x, y)
             self.theta -= gradient
 
-            running_loss = MyLinearRegression.cost_(y, utils.predict(norm_x, self.theta))
+            y_hat = utils.predict(norm_x, self.theta)
+            running_loss = MyLinearRegression.cost_(y, y_hat)
             losses.append(running_loss)
 
+            if False and i % 100 == 0:
+                self.plot_hypo(x, y, y_hat)
+                plt.show()
+
         utils.save_theta(self.theta)
-        y_hat = utils.predict(norm_x, self.theta)
         print(f"Last loss: {losses[-1]}")
 
         self.plot(x, y, y_hat, losses)
 
 def main():
-    mylr = MyLinearRegression(0.1)
+    parser = argparse.ArgumentParser(description='Train model with linear regression')
+    parser.add_argument('--alpha', action='store', default=0.1, type=float,
+        help='define learning rate (default: 0.1)')
+    parser.add_argument('--max_iter', action='store', default=1000, type=int,
+        help='define number of iterations (default: 1000)')
+    parser.add_argument('--show', action='store_true',
+        help='display plots while the gradient descent')
+    args = parser.parse_args()
+
+    mylr = MyLinearRegression(alpha=args.alpha, max_iter=args.max_iter)
     km, price = utils.get_data()
     mylr.fit(km, price)
 
