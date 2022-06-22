@@ -10,6 +10,7 @@ class MyLinearRegression():
         self.alpha = alpha
         self.max_iter = max_iter
         self.theta = utils.get_theta()
+        print(f"MyLR: Using {self.alpha = }, and {self.max_iter = }")
         print(f"MyLR: got theta {utils.str_array(self.theta)}")
 
     @staticmethod
@@ -27,7 +28,7 @@ class MyLinearRegression():
         j_elem = (y_hat - y) ** 2 / y.shape[0]
         return np.sum(j_elem)
 
-    def plot_hypo(self, x: np.ndarray, y: np.ndarray, y_hat: np.ndarray):
+    def plot_hypo(self, x: np.ndarray, y: np.ndarray, y_hat: np.ndarray) -> None:
         plt.figure()
         # Data repartition
         plt.plot(x, y, "o")
@@ -75,7 +76,7 @@ class MyLinearRegression():
         nabla_j = np.asarray([[theta0], [theta1]])
         return nabla_j
 
-    def fit(self, x: np.ndarray, y: np.ndarray) -> None:
+    def fit(self, x: np.ndarray, y: np.ndarray, show_gradient: bool) -> None:
         """
         Description:
             Fits the model to the training dataset contained in x and y.
@@ -87,7 +88,7 @@ class MyLinearRegression():
             max_iter: an int, the number of iterations done
         """
         alpha = self.alpha
-        if x.shape != y.shape or self.theta.shape != (2, 1):
+        if x.shape != y.shape or self.theta.shape != (2, 1) or self.max_iter <= 0:
             return None
         norm_x = self.minmax(x)
         losses = []
@@ -99,7 +100,7 @@ class MyLinearRegression():
             running_loss = MyLinearRegression.cost_(y, y_hat)
             losses.append(running_loss)
 
-            if False and i % 100 == 0:
+            if show_gradient and i % 100 == 0:
                 self.plot_hypo(x, y, y_hat)
                 plt.show()
 
@@ -115,12 +116,12 @@ def main():
     parser.add_argument('--max_iter', action='store', default=1000, type=int,
         help='define number of iterations (default: 1000)')
     parser.add_argument('--show', action='store_true',
-        help='display plots while the gradient descent')
+        help='display plots during gradient descent')
     args = parser.parse_args()
 
     mylr = MyLinearRegression(alpha=args.alpha, max_iter=args.max_iter)
     km, price = utils.get_data()
-    mylr.fit(km, price)
+    mylr.fit(km, price, args.show)
 
 if __name__ == "__main__":
     main()
