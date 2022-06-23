@@ -4,6 +4,7 @@ This project is about making *Linear Regression* using *Gradient Descent* on a f
 
 <p align="center">
   <img src="./assets/gradient_descent.gif" >
+  <img src="./assets/loss.png" >
 </p>
 
 ## Usage
